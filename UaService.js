@@ -25,24 +25,22 @@ function getRequestOptions(url){
 }
 
 function GetProfile(storeUrl, callback) {
-    var request = http.request(getRequestOptions(storeUrl), function (response) {
-        var reqText= '';
-        console.log(options.host + ':' + res.statusCode);
-        res.setEncoding('utf8');
-
-        response.on('data', function (chunk) {
-            reqText += chunk;
+    var req = http.request(getRequestOptions(storeUrl), function (res) {
+        if (res.statusCode == 404) {
+            callback(404);
         }
+            
+        res.setEncoding('utf8');
+        var profileText= '';
+        response.on('data', function (chunk) {profileText += chunk});
         
         res.on('end', function() {
-            callback(querystring.parse(reqText));
+            callback(null, querystring.parse('{'+profileText+'}'));
         });
- 
-        querystring.parse(
-          
-      });
-      
     });
+    
+    req.on('error', function(err) {console.error(err)})
+    
 }
 
 function connectProfile (request, response) {
@@ -56,22 +54,25 @@ function connectProfile (request, response) {
 		var port = socket.remotePort;
 
 		// Lookup profile on the blockstore
-    blockstore.lookup(id, (storeUrl, console.error) => {
+    blockstore.lookup(id, (err, storeUrl) => {
         if (err) {
-            // Replyto client that the id could not be resolved
+            // Reply to client that the id could not be resolved
             response.statusCode = 404;
             response.end();
+            return;
         }
         
-        //  HACKATHON: Get profile from datastore
-        
-        // Reply to the client with profile info
-        console.log("lookup successful! url= " + storeUrl);
-        response.statusCode = 200;
-        response.write(querystring.stringify({id: id, provider: PROVIDER_URL, profile: profile}
-        response.end();
-    });
-    
+        GetProfile(storeUrl, (err, profile) => {
+            if (err) {
+                //Reply to the client 
+            }
+            // Reply to the client with profile info
+            console.log("lookup successful! url= " + storeUrl);
+            response.statusCode = 200;
+            response.write(querystring.stringify({id: id, provider: PROVIDER_URL, profile: profile}))
+            response.end();
+        });
+    });    
 }
 
 function  createProfile (request, response) {
@@ -107,7 +108,7 @@ function  createProfile (request, response) {
     });
 }
 
-app.post('/', function (request, response) {
+app.get('/', function (request, response) {
 	var method = request.body.method;
 	console.log('method= ' + method)
 	if (method == 'connectProfile') {
