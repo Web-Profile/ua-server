@@ -142,6 +142,7 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
 }
 
 function connectProfile (request, response) {
+    console.log("connectProfile");
 		// Check parameters
 		var id = request.body.id;
 		console.log('id= ' + id)
@@ -235,14 +236,19 @@ function  createProfile (request, response) {
 
 app.get('/', function (request, response) {
 	var method = request.body.method;
-	console.log('method= ' + method)
+	console.log('GET - method= ' + method)
 	if (method == 'connectProfile') {
     connectProfile (request, response);
 	}
+});
+app.post('/', function (request, response) {
+	var method = request.body.method;
+	console.log('POST - method= ' + method)
 	if (method == 'createProfile') {
     createProfile (request, response);
   }
 });
+
 
 console.log("start");
 var server = app.listen(PROVIDER_PORT);
