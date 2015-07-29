@@ -1,3 +1,5 @@
+var blockstore = exports;
+
 var execSync = require('child_process').execSync;
 var http = require('http');
 var querystring = require('querystring');
@@ -37,7 +39,7 @@ function onenameRequest (body, onResult){
     req.end();
 }
 
-function lookup (id, callback)
+blockstore.lookup (id, callback)
 {  
     if (id === "satya") {return callback (null,"http://somthing.com");}
  
@@ -57,7 +59,7 @@ function lookup (id, callback)
     });
 }
 
-function reserve(id, addr, profile, callback) {
+blockstore.reserve(id, addr, profile, callback) {
 
     var body =
       {
@@ -70,6 +72,3 @@ function reserve(id, addr, profile, callback) {
         return callback (body.status, null) 
     });
 }
-
-export lookup;
-export reserve;
