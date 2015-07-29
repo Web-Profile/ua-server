@@ -35,7 +35,7 @@ logger.addHandler(logging.NullHandler())
 from twisted.internet import reactor
 from txjsonrpc.netstring.jsonrpc import Proxy
 
-proxy = Proxy(config.BLOCKSTORED_SERVER, config.BLOCKSTORED_PORT)
+proxy = Proxy('52.0.28.169', 6264)
 
 
 def printValue(value):
