@@ -2,9 +2,7 @@ var http = require('http');
 var express = require('express');
 var blockstore = require('blockstore');
 var crypto = require('crypto');
-//var bl = require('bl');
 var querystring = require('querystring');
-var blockstore = require('blockstore');
 
 var app = express();
 
@@ -20,12 +18,12 @@ function exitOnError(err) {
 }
 
 function newProfileObject(uaPubKey) {
-    return = {
+    return {
         agents: [{UA_pub:uaPubkey}]
     }
 }
 function getRequestOptions(method, url){
-  return  = {
+  return  {
     hostname: url,
     port: 80,
     method: method,
@@ -75,6 +73,7 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
     req.write(querystring.stringify(requestObj));
     req.end();
 }
+
 function connectProfile (request, response) {
 		// Check parameters
 		var id = request.body.id;
@@ -86,7 +85,7 @@ function connectProfile (request, response) {
 		var port = socket.remotePort;
 
 		// Lookup profile on the blockstore
-    blockstore.lookup(id, (err, profileUrl) => {
+    blockstore.lookup(id, function (err, profileUrl) {
         if (err) {exitOnError(err)}
         if (!profileUrl) {
             // Reply to client that the id could not be resolved
@@ -95,7 +94,7 @@ function connectProfile (request, response) {
             response.end();
             return;
         }
-        GetProfile(profileUrl, (err, profile) => {
+        GetProfile(profileUrl, function (err, profile) {
             if (err) {
                 //TODO: Reply to the client
                 exitOnError(err)
@@ -128,7 +127,7 @@ function  createProfile (request, response) {
     var uaPubKey = Diffhell.generateKeys();
     var uaPrivKey = Diffhell.getPrivateKey
     // TODO: Save uaPrivKey
-    
+
     // Reserve name on the blockchain
     blockstore.reserve(id, bcPrivKey, function (err, success) {
         if (err) {
@@ -145,20 +144,20 @@ function  createProfile (request, response) {
         // Create profile object
         var profile = newProfileObject(uaPubkey)
         
-        RequestUrlFromStore(DATASTORE_URL, {key:uaPubKey, data:profile}, (err, profileUrl) => {
+        RequestUrlFromStore(DATASTORE_URL, {key:uaPubKey, data:profile}, function (err, profileUrl) {
             console.log("datastore url request successful! url= " + profileUrl);
 
             // Add url to blockchain
-            blockstore.update(id, bcPrivKey, bcPubKey, profileUrl, (err) => {
+            blockstore.update(id, bcPrivKey, bcPubKey, profileUrl, function (err) {
                 if (err) {
                   // TODO: reply to client
-                  exitOnError(err)
+                  exitOnError(err);
                 }
                 console.log("blockchain update successful!");
   
                 // Reply to the client with profile info
                 response.statusCode = 200;
-                response.write(querystring.stringify{profile: profile})
+                response.write(querystring.stringify({profile: profile}));
                 response.end();
     
             });    
@@ -176,7 +175,7 @@ app.get('/', function (request, response) {
 	if (method == 'createProfile') {
     createProfile (request, response);
   }
-)
+});
 
 console.log("start");
 var server = app.listen(PROVIDER_PORT);
