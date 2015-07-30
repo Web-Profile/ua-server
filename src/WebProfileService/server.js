@@ -25,7 +25,7 @@ var appsecret = "779b8b5bb1b0103b8a25f3dfe77d47e78bbcc0c64c89e159d061bfcfe042d74
 // BLOCKSTORE FUNCTIONS //
 //////////////////////////
 var options =
-  {
+ {
     hostname: "api.onename.com",
     port: 80,
     method: 'POST',
@@ -44,15 +44,15 @@ function blockstoreOneNameRequest(body, callback) {
             output += chunk;
         });
         
-        res.on('end', function () {            
+        res.on('end', function () {
             console.log("blockstoreOneNameRequest: output= " + output);
-
+            
             // Expected format: {"status": "success"}
             if (res.statusCode = 200) return callback(null, JSON.parse(output));
             else return callback(res.statusCode);
         });
     });
-
+    
     req.on('error', function (err) { });
     // Add userid
     
@@ -63,7 +63,7 @@ function blockstoreOneNameRequest(body, callback) {
 function blockstorelookup(id, callback) {
     console.log("blockstorelookup: id= " + id);
     if (id === "satya") { return callback(null, "http://wp-dss.azurewebsites.net/api/Profile/e74f603b70c1470f9661b98a01816af8"); }
-
+    
     blockstoreOneNameRequest(id, function (err, obj) {
         console.log("blockstorelookup: obj= " + JSON.stringify(obj));
         if (err) { return callback(err) }
@@ -74,14 +74,14 @@ function blockstorelookup(id, callback) {
 }
 
 function blockstorereserve(id, addr, profile, callback) {
-    var body
+    var body;
     body.passname = id;
     body.recipient_address = addr;
     body.passcard.webprofile = profile;
-
+    
     //Expected format: {"passname": id,"recipient_address": addr,"passcard": { "Webprofile": profile }}
     console.log("blockstorereserve: body= " + JSON.parse(body));
-
+    
     blockstoreOneNameRequest(body, function (err, obj) {
         //Expected format: {"status": success}
         console.log("blockstorereserve: obj= " + JSON.parse(obj));
@@ -101,6 +101,7 @@ function newProfileObject(uaPubKey) {
 // DATASTORE FUNCTIONS //
 /////////////////////////
 function getRequestOptions(method, targetUrl) {
+    
     var options = {
         hostname: url.parse(targetUrl).hostname,
         port: 80,
@@ -117,7 +118,7 @@ function getRequestOptions(method, targetUrl) {
 
 function GetProfile(profileUrl, callback) {
     console.log("GetProfile: profileUrl= " + profileUrl);
-
+    
     var req = http.request(getRequestOptions('GET', profileUrl), function (res) {
         console.log("Getprofile: Got response");
         if (res.statusCode == 404) {
@@ -128,7 +129,7 @@ function GetProfile(profileUrl, callback) {
         res.setEncoding('utf8');
         var text = '';
         res.on('data', function (chunk) { text += chunk });
-
+        
         res.on('end', function () {
             // return as string since we don't always need it parsed
             console.log("GetProfile: text= " + text);
@@ -197,17 +198,17 @@ function connectProfile(request, response) {
         GetProfile(profileUrl, function (err, profile) {
             if (err) {
                 //TODO: Reply to the client
-                exitOnError(err)
+                exitOnError(err);
             }
             // Reply to the client with profile info
             console.log("lookup successful! url= " + profileUrl);
             response.statusCode = 200;
-            var body
-            body.id = id;
-            body.provider = PROVIDER_URL;
-            body.profile = profile;
-            response.write(JSON.stringify(body));
-            response.end();
+            //var body= {};
+            //body.provider = PROVIDER_URL;
+            //body.profile = profile;
+            //response.write(JSON.stringify(body));
+            response.write(profile);
+            response.end(profile);
         });
     });
 }
@@ -217,36 +218,36 @@ function createProfile(request, response) {
     var id = request.body.id;
     var primaryFactor = request.body.primaryFactor;
     var secondaryFactor = request.body.secondaryFactors[1];
-    console.log('id= ' + id)
-    console.log('primaryFactor= ' + primaryFactor)
-    console.log('secondaryFactors[1]= ' + secondaryFactor)
+    console.log('id= ' + id);
+    console.log('primaryFactor= ' + primaryFactor);
+    console.log('secondaryFactors[1]= ' + secondaryFactor);
     
     // Generate keypair
     // Change to 2048 for production
     var Diffhell = crypto.createDiffieHellman(256);
     
     var bcPubKey = Diffhell.generateKeys();
-    var bcPubKey = Diffhell.getPrivateKey
+    var bcPubKey = Diffhell.getPrivateKey;
     
     var uaPubKey = Diffhell.generateKeys();
-    var uaPrivKey = Diffhell.getPrivateKey
+    var uaPrivKey = Diffhell.getPrivateKey;
     // TODO: Save uaPrivKey
     
     // Reserve name on the blockchain
     blockstorereserve(id, addr, profile, function (err, reply) {
         if (err) {
             // TODO: reply to client
-            exitOnError(err)
+            exitOnError(err);
         }
         if (JSON.parse(reply).status != "success") {
             // TODO: reply to client that the id was taken
             return;
         }
-
+        
         console.log("createProfile: blockstore reservation successful!");
         
         // Create profile object
-        var profile = newProfileObject(uaPubkey)
+        var profile = newProfileObject(uaPubkey);
         
         RequestUrlFromStore(DATASTORE_URL, { key: uaPubKey, data: profile }, function (err, profileUrl) {
             console.log("datastore url request successful! url= " + profileUrl);
@@ -259,12 +260,12 @@ function createProfile(request, response) {
                 }
                 console.log("blockchain update successful!");
                 
-                var body
-                body.profile = profile;
-
+                //var body;
+                //body.profile = profile;
+                
                 // Reply to the client with profile info
                 response.statusCode = 200;
-                response.write(JSON.stringify(body));
+                response.write(profile);
                 response.end();
 
             });
