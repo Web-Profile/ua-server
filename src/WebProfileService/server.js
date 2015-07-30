@@ -13,7 +13,6 @@ const DATASTORE_URL = "http://www.firstprofilestore.com";
 //var http = require('http');
 var express = require('express');
 var crypto = require('crypto');
-var querystring = require('querystring');
 var bodyParser = require('body-parser');
 //var execSync = require('child_process').execSync;
 
@@ -32,6 +31,7 @@ var options =
 };
 
 function blockstoreOneNameRequest(body, onResult) {
+    console.log("blockstoreOneNameRequest: body= " + JSON.stringify(body));
     var req = http.request(options, function (res) {
         res.setEncoding('utf8');
         
@@ -41,6 +41,9 @@ function blockstoreOneNameRequest(body, onResult) {
         });
         
         res.on('end', function () {            
+            console.log("blockstoreOneNameRequest: output= " + output);
+
+            // Expected format: {"status": "success"}
             if (res.statusCode = 200) return onResult(null, JSON.parse(output));
             else return onResult(res.statusCode);
         });
@@ -53,13 +56,13 @@ function blockstoreOneNameRequest(body, onResult) {
 }
 
 function blockstorelookup(id, callback) {
+    console.log("blockstorelookup: id= " + id);
     if (id === "satya") { return callback(null, "http://somthing.com"); }
     
-    var body =
-      {
-
-      };
+    var body.
+    
     blockstoreOneNameRequest(body, function (err, obj) {
+        console.log("blockstorelookup: obj= " + JSON.stringify(obj));
         if (err) { return callback(err) }
         
         var url = obj[id].profile.webprofile;
@@ -68,15 +71,18 @@ function blockstorelookup(id, callback) {
 }
 
 function blockstorereserve(id, addr, profile, callback) {
-    var body =
- {
-        "passname": id,
-        "recipient_address": addr,
-        "passcard": { "Webprofile": profile }
-    };
+    var body.passname = id;
+    body.recipient_address = addr;
+    body.passcard.webprofile = profile;
+
+    //Expected format: {"passname": id,"recipient_address": addr,"passcard": { "Webprofile": profile }}
+    console.log("blockstorereserve: body= " + JSON.parse(body));
+
     blockstoreOneNameRequest(body, function (err, obj) {
+        //Expected format: {"status": success}
+        console.log("blockstorereserve: obj= " + JSON.parse(obj));
         if (err) { return callback(err) }
-        return callback(body.status, null)
+        return callback(obj.status, null)
     });
 }
 
@@ -137,12 +143,12 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
         response.on('data', function (chunk) { text += chunk });
         
         res.on('end', function () {
-            callback(null, querystring.parse(text).location);
+            callback(null, JSON.parse(text).location);
         });
     });
     req.on('error', exitOnError);
     
-    req.write(querystring.stringify(requestObj));
+    req.write(JSON.stringify(requestObj));
     req.end();
 }
 
@@ -159,6 +165,7 @@ function connectProfile(request, response) {
     
     // Lookup profile on onename blockstore
     blockstorelookup(id, function (err, profileUrl) {
+    console.log("connectProfile: profileUrl= " + profileUrl);
         if (err) { exitOnError(err) }
         if (!profileUrl) {
             // Reply to client that the id could not be resolved
@@ -175,7 +182,10 @@ function connectProfile(request, response) {
             // Reply to the client with profile info
             console.log("lookup successful! url= " + profileUrl);
             response.statusCode = 200;
-            response.write(querystring.stringify({ id: id, provider: PROVIDER_URL, profile: profile }))
+            var body.id = id;
+            body.provider = PROVIDER_URL;
+            body.profile = profile;
+            response.write(JSON.stringify(body));
             response.end();
         });
     });
@@ -202,17 +212,17 @@ function createProfile(request, response) {
     // TODO: Save uaPrivKey
     
     // Reserve name on the blockchain
-    blockstorereserve(id, bcPrivKey, function (err, success) {
+    blockstorereserve(id, addr, profile, function (err, reply) {
         if (err) {
             // TODO: reply to client
             exitOnError(err)
         }
-        if (!sucess) {
+        if (JSON.parse(reply).status != "success") {
             // TODO: reply to client that the id was taken
             return;
         }
-        
-        console.log("blockstore reservation successful!");
+
+        console.log("createProfile: blockstore reservation successful!");
         
         // Create profile object
         var profile = newProfileObject(uaPubkey)
@@ -228,9 +238,11 @@ function createProfile(request, response) {
                 }
                 console.log("blockchain update successful!");
                 
+                var body.profile = profile;
+
                 // Reply to the client with profile info
                 response.statusCode = 200;
-                response.write(querystring.stringify({ profile: profile }));
+                response.write(JSON.stringify(body));
                 response.end();
 
             });
