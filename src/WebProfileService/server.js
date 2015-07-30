@@ -149,7 +149,7 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
             exitOnError(404);
         }
         
-        res.setEncoding('utf8');
+        res.setEncoding('utf-8');
         var text = '';
         response.on('data', function (chunk) { text += chunk });
         console.log("GetProfile: text= " + text);
@@ -203,9 +203,22 @@ function connectProfile(request, response) {
             // Reply to the client with profile info
             console.log("lookup successful! url= " + profileUrl);
             response.statusCode = 200;
-            response.end(JSON.stringify({
-                profile: JSON.parse(profile)
-            }));
+            
+            var content = JSON.stringify({profile: JSON.parse(JSON.parse(profile))});
+            //var content = JSON.stringify(
+            //    {
+            //        profile: {
+            //            version: "0.0.1",
+            //            public_key: "042c6b7e6da7633c8f226891cc7fa8e5ec84f8eacc792a46786efc869a408d29539a5e6f8de3f71c0014e8ea71691c7b41f45c083a074fef7ab5c321753ba2b3fe",
+            //            name: "Foo Bar",
+            //            url: "http://address-goes-here.com"
+            //        }
+            //    }
+            //);
+            
+            response.writeHead(200, { "Content-Type": "application/json; charset=utf-8", "content-length": content.length });
+            response.end(content);
+
         });
     });
 }
