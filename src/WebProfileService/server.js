@@ -68,8 +68,8 @@ function blockstorelookup(id, callback) {
         console.log("blockstorelookup: obj= " + JSON.stringify(obj));
         if (err) { return callback(err) }
         
-        var url = obj[id].profile.webprofile;
-        return callback(null, url);
+        var targetUrl = obj[id].profile.webprofile;
+        return callback(null, targetUrl);
     });
 }
 
@@ -100,13 +100,13 @@ function newProfileObject(uaPubKey) {
 /////////////////////////
 // DATASTORE FUNCTIONS //
 /////////////////////////
-function getRequestOptions(method, url) {
+function getRequestOptions(method, targetUrl) {
 
     var options = {
-        hostname: url.parse(url).hostname,
+        hostname: url.parse(targetUrl).hostname,
         port: 80,
         method: method,
-        pathname: url.parse(url).pathname,
+        pathname: url.parse(targetUrl).pathname,
         headers: {
             'Content-Type': 'application/json',
             'Accept-Type': 'application/json'
@@ -281,7 +281,7 @@ app.use(function (req, res, next) {
 
 app.get('/', function (request, response) {
     
-    var success = { status: "sucess" };
+    var success = { status: "success" };
     var command = request.body.command;
     console.log('GET - method = ' + command);
     
@@ -292,7 +292,7 @@ app.get('/', function (request, response) {
     response.end(JSON.stringify(success));
 });
 app.post('/', function (request, response) {
-    var success = { status: "sucess" };
+    var success = { status: "success" };
     var command = request.body.command;
     console.log('GET - method = ' + command);
     
