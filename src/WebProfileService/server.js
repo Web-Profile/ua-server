@@ -69,7 +69,8 @@ function blockstorelookup(id, callback) {
 }
 
 function blockstorereserve(id, addr, profile, callback) {
-    var body.passname = id;
+    var body
+    body.passname = id;
     body.recipient_address = addr;
     body.passcard.webprofile = profile;
 
@@ -180,7 +181,8 @@ function connectProfile(request, response) {
             // Reply to the client with profile info
             console.log("lookup successful! url= " + profileUrl);
             response.statusCode = 200;
-            var body.id = id;
+            var body
+            body.id = id;
             body.provider = PROVIDER_URL;
             body.profile = profile;
             response.write(JSON.stringify(body));
@@ -236,7 +238,8 @@ function createProfile(request, response) {
                 }
                 console.log("blockchain update successful!");
                 
-                var body.profile = profile;
+                var body
+                body.profile = profile;
 
                 // Reply to the client with profile info
                 response.statusCode = 200;
