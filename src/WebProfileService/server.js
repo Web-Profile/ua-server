@@ -41,15 +41,15 @@ function blockstoreOneNameRequest(body, onResult) {
         });
         
         res.on('end', function () {
-            if (res.statusCode = 200) onResult(null, obj);
-            else onResult(res.statusCode, obj);
+            
+            if (res.statusCode = 200) return onResult(null, JSON.parse(output));
+            else return onResult(res.statusCode);
         });
-
     });
-    
+
     req.on('error', function (err) { });
-    
-    req.write(querystring.stringify(body));
+
+    req.write(JSON.stringify(body));
     req.end();
 }
 
