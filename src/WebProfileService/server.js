@@ -19,7 +19,9 @@ var bodyParser = require('body-parser');
 var appid = "82af8b0b4e3113a777bf3c3c6f8a372e";
 var appsecret = "779b8b5bb1b0103b8a25f3dfe77d47e78bbcc0c64c89e159d061bfcfe042d744";
 
-// BLOCKSTORE STUFF
+//////////////////////////
+// BLOCKSTORE FUNCTIONS //
+//////////////////////////
 var options =
  {
     hostname: "api.onename.com",
@@ -99,6 +101,10 @@ function newProfileObject(uaPubKey) {
     }
 }
 
+
+/////////////////////////
+// DATASTORE FUNCTIONS //
+/////////////////////////
 function getRequestOptions(method, url) {
     return {
         hostname: url,
@@ -151,6 +157,9 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
     req.end();
 }
 
+///////////////////////////
+// MAIN SERVER FUNCTIONS //
+///////////////////////////
 function connectProfile(request, response) {
     console.log("connectProfile");
     // Check parameters
