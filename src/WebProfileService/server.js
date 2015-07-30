@@ -135,6 +135,8 @@ function GetProfile(profileUrl, callback) {
         });
     });
     req.on('error', exitOnError)
+    
+    console.log("GetProfile: sending request");
     req.end();
 }
 
