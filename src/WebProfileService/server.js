@@ -180,7 +180,7 @@ function connectProfile(request, response) {
         if (!profileUrl) {
             // Reply to client that the id could not be resolved
             // This expected for new users and is not an application error 
-            console.log("connectProfile: no profile found);
+            console.log("connectProfile: no profile found");
             response.statusCode = 404;
             response.end();
             return;
