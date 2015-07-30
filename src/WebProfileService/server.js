@@ -203,12 +203,9 @@ function connectProfile(request, response) {
             // Reply to the client with profile info
             console.log("lookup successful! url= " + profileUrl);
             response.statusCode = 200;
-            //var body= {};
-            //body.provider = PROVIDER_URL;
-            //body.profile = profile;
-            //response.write(JSON.stringify(body));
-            response.write(profile);
-            response.end(profile);
+            response.end(JSON.stringify({
+                profile: profile
+            }));
         });
     });
 }
@@ -291,9 +288,9 @@ app.get('/', function (request, response) {
     
     if (command == 'connectProfile') {
         connectProfile(request, response);
+    } else {
+        response.end(JSON.stringify(success));
     }
-    
-    response.end(JSON.stringify(success));
 });
 app.post('/', function (request, response) {
     var success = { status: "success" };
@@ -302,11 +299,11 @@ app.post('/', function (request, response) {
     
     if (command == 'connectProfile') {
         connectProfile(request, response);
-    }
-    if (command == 'createProfile') {
+    } else if (command == 'createProfile') {
         createProfile(request, response);
+    } else {
+        response.end();
     }
-    response.end();
 });
 
 //var server = app.listen(PROVIDER_PORT);
