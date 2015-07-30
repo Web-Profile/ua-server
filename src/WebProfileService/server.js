@@ -119,6 +119,7 @@ function GetProfile(profileUrl, callback) {
     console.log("GetProfile: profileUrl= " + profileUrl);
 
     var req = http.request(getRequestOptions('GET', profileUrl), function (res) {
+        console.log("Getprofile: Got response");
         if (res.statusCode == 404) {
             console.log("GetProfile: 404'd");
             return callback(404);
@@ -127,10 +128,10 @@ function GetProfile(profileUrl, callback) {
         res.setEncoding('utf8');
         var text = '';
         response.on('data', function (chunk) { text += chunk });
-        console.log("GetProfile: text= " + text);
 
         res.on('end', function () {
             // return as string since we don't always need it parsed
+            console.log("GetProfile: text= " + text);
             callback(null, '{' + text + '}');
         });
     });
