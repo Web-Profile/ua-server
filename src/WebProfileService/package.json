@@ -1,0 +1,10 @@
+{
+  "name": "WebProfileService",
+  "version": "0.0.0",
+  "description": "WebProfileService",
+  "main": "server.js",
+  "author": {
+    "name": "waelra",
+    "email": ""
+  }
+}
