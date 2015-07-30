@@ -133,7 +133,7 @@ function GetProfile(profileUrl, callback) {
         res.on('end', function () {
             // return as string since we don't always need it parsed
             console.log("GetProfile: text= " + text);
-            callback(null, '{' + text + '}');
+            callback(null, text);
         });
     });
     req.on('error', exitOnError)
@@ -204,7 +204,7 @@ function connectProfile(request, response) {
             console.log("lookup successful! url= " + profileUrl);
             response.statusCode = 200;
             response.end(JSON.stringify({
-                profile: profile
+                profile: JSON.parse(profile)
             }));
         });
     });
