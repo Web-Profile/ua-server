@@ -102,20 +102,22 @@ function newProfileObject(uaPubKey) {
 /////////////////////////
 function getRequestOptions(method, url) {
 
-    return {
-        hostname: url.parse(profileUrl).hostname,
+    var options = {
+        hostname: url.parse(url).hostname,
         port: 80,
         method: method,
-        pathname: url.parse(profileUrl).pathname,
+        pathname: url.parse(url).pathname,
         headers: {
             'Content-Type': 'application/json',
             'Accept-Type': 'application/json'
         }
     };
+    console.log("getRequestOptions: options= " + JSON.stringify(options));
 }
 
 function GetProfile(profileUrl, callback) {
     console.log("GetProfile: profileUrl= " + profileUrl);
+
     var req = http.request(getRequestOptions('GET', profileUrl), function (res) {
         if (res.statusCode == 404) {
             console.log("GetProfile: 404'd");
