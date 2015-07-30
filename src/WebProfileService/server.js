@@ -56,14 +56,8 @@ function blockstoreOneNameRequest(body, onResult) {
 }
 
 function blockstorelookup(id, callback) {
-<<<<<<< HEAD
     console.log("blockstorelookup: id= " + id);
-    if (id === "satya") { return callback(null, "http://somthing.com"); }
-=======
     if (id === "satya") { return callback(null, "http://wp-dss.azurewebsites.net/api/Profile/e74f603b70c1470f9661b98a01816af8"); }
->>>>>>> aa348278faa61103abe2164f48e8c5a71cf9a1fe
-    
-    var body.
     
     blockstoreOneNameRequest(body, function (err, obj) {
         console.log("blockstorelookup: obj= " + JSON.stringify(obj));
