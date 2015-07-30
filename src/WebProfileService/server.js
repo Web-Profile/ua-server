@@ -52,7 +52,8 @@ function blockstoreOneNameRequest(body, callback) {
     });
 
     req.on('error', function (err) { });
-
+    // Add userid
+    
     req.write(JSON.stringify(body));
     req.end();
 }
@@ -60,8 +61,9 @@ function blockstoreOneNameRequest(body, callback) {
 function blockstorelookup(id, callback) {
     console.log("blockstorelookup: id= " + id);
     if (id === "satya") { return callback(null, "http://wp-dss.azurewebsites.net/api/Profile/e74f603b70c1470f9661b98a01816af8"); }
+
     
-    blockstoreOneNameRequest(body, function (err, obj) {
+    blockstoreOneNameRequest(id, function (err, obj) {
         console.log("blockstorelookup: obj= " + JSON.stringify(obj));
         if (err) { return callback(err) }
         
@@ -109,16 +111,18 @@ function getRequestOptions(method, url) {
 }
 
 function GetProfile(profileUrl, callback) {
+    console.log("GetProfile: " + profileUrl);
     var req = http.request(getRequestOptions('GET', profileUrl), function (res) {
         if (res.statusCode == 404) {
-            callback(404);
-            exitOnError(404);
+            console.log("GetProfile: 404'd");
+            return callback(404);
         }
         
         res.setEncoding('utf8');
         var text = '';
         response.on('data', function (chunk) { text += chunk });
-        
+        console.log("GetProfile: text= " + text);
+
         res.on('end', function () {
             // return as string since we don't always need it parsed
             callback(null, '{' + text + '}');
@@ -138,6 +142,7 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
         res.setEncoding('utf8');
         var text = '';
         response.on('data', function (chunk) { text += chunk });
+        console.log("GetProfile: text= " + text);
         
         res.on('end', function () {
             callback(null, JSON.parse(text).location);
@@ -170,11 +175,12 @@ function connectProfile(request, response) {
     
     // Lookup profile on onename blockstore
     blockstorelookup(id, function (err, profileUrl) {
-    console.log("connectProfile: profileUrl= " + profileUrl);
+        console.log("connectProfile: profileUrl= " + profileUrl);
         if (err) { exitOnError(err) }
         if (!profileUrl) {
             // Reply to client that the id could not be resolved
             // This expected for new users and is not an application error 
+            console.log("connectProfile: no profile found);
             response.statusCode = 404;
             response.end();
             return;
