@@ -40,8 +40,7 @@ function blockstoreOneNameRequest(body, onResult) {
             output += chunk;
         });
         
-        res.on('end', function () {
-            
+        res.on('end', function () {            
             if (res.statusCode = 200) return onResult(null, JSON.parse(output));
             else return onResult(res.statusCode);
         });
@@ -57,9 +56,9 @@ function blockstorelookup(id, callback) {
     if (id === "satya") { return callback(null, "http://wp-dss.azurewebsites.net/api/Profile/e74f603b70c1470f9661b98a01816af8"); }
     
     var body =
- {
+      {
 
-    };
+      };
     blockstoreOneNameRequest(body, function (err, obj) {
         if (err) { return callback(err) }
         
@@ -158,7 +157,7 @@ function connectProfile(request, response) {
     var ipAddr = socket.remoteAddress;
     var port = socket.remotePort;
     
-    // Lookup profile on the blockstore
+    // Lookup profile on onename blockstore
     blockstorelookup(id, function (err, profileUrl) {
         if (err) { exitOnError(err) }
         if (!profileUrl) {
