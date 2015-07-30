@@ -105,7 +105,7 @@ function getRequestOptions(method, targetUrl) {
         hostname: url.parse(targetUrl).hostname,
         port: 80,
         method: method,
-        pathname: url.parse(targetUrl).pathname,
+        path: url.parse(targetUrl).pathname,
         headers: {
             'Content-Type': 'application/json',
             'Accept-Type': 'application/json'
@@ -127,7 +127,7 @@ function GetProfile(profileUrl, callback) {
         
         res.setEncoding('utf8');
         var text = '';
-        response.on('data', function (chunk) { text += chunk });
+        res.on('data', function (chunk) { text += chunk });
 
         res.on('end', function () {
             // return as string since we don't always need it parsed
