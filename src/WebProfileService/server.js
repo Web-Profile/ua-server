@@ -16,6 +16,8 @@ var crypto = require('crypto');
 var bodyParser = require('body-parser');
 //var execSync = require('child_process').execSync;
 
+var url = require('url');
+
 var appid = "82af8b0b4e3113a777bf3c3c6f8a372e";
 var appsecret = "779b8b5bb1b0103b8a25f3dfe77d47e78bbcc0c64c89e159d061bfcfe042d744";
 
@@ -62,7 +64,6 @@ function blockstorelookup(id, callback) {
     console.log("blockstorelookup: id= " + id);
     if (id === "satya") { return callback(null, "http://wp-dss.azurewebsites.net/api/Profile/e74f603b70c1470f9661b98a01816af8"); }
 
-    
     blockstoreOneNameRequest(id, function (err, obj) {
         console.log("blockstorelookup: obj= " + JSON.stringify(obj));
         if (err) { return callback(err) }
@@ -100,18 +101,21 @@ function newProfileObject(uaPubKey) {
 // DATASTORE FUNCTIONS //
 /////////////////////////
 function getRequestOptions(method, url) {
+
     return {
-        hostname: url,
+        hostname: url.parse(profileUrl).hostname,
         port: 80,
         method: method,
+        pathname: url.parse(profileUrl).pathname,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept-Type': 'application/json'
         }
     };
 }
 
 function GetProfile(profileUrl, callback) {
-    console.log("GetProfile: " + profileUrl);
+    console.log("GetProfile: profileUrl= " + profileUrl);
     var req = http.request(getRequestOptions('GET', profileUrl), function (res) {
         if (res.statusCode == 404) {
             console.log("GetProfile: 404'd");
