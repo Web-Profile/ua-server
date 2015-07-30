@@ -101,7 +101,6 @@ function newProfileObject(uaPubKey) {
 // DATASTORE FUNCTIONS //
 /////////////////////////
 function getRequestOptions(method, targetUrl) {
-
     var options = {
         hostname: url.parse(targetUrl).hostname,
         port: 80,
@@ -113,6 +112,7 @@ function getRequestOptions(method, targetUrl) {
         }
     };
     console.log("getRequestOptions: options= " + JSON.stringify(options));
+    return options;
 }
 
 function GetProfile(profileUrl, callback) {
