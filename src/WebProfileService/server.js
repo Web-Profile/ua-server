@@ -23,7 +23,7 @@ var appsecret = "779b8b5bb1b0103b8a25f3dfe77d47e78bbcc0c64c89e159d061bfcfe042d74
 // BLOCKSTORE FUNCTIONS //
 //////////////////////////
 var options =
- {
+  {
     hostname: "api.onename.com",
     port: 80,
     method: 'POST',
@@ -32,7 +32,7 @@ var options =
     }
 };
 
-function blockstoreOneNameRequest(body, onResult) {
+function blockstoreOneNameRequest(body, callback) {
     console.log("blockstoreOneNameRequest: body= " + JSON.stringify(body));
     var req = http.request(options, function (res) {
         res.setEncoding('utf8');
@@ -46,8 +46,8 @@ function blockstoreOneNameRequest(body, onResult) {
             console.log("blockstoreOneNameRequest: output= " + output);
 
             // Expected format: {"status": "success"}
-            if (res.statusCode = 200) return onResult(null, JSON.parse(output));
-            else return onResult(res.statusCode);
+            if (res.statusCode = 200) return callback(null, JSON.parse(output));
+            else return callback(res.statusCode);
         });
     });
 
@@ -85,14 +85,6 @@ function blockstorereserve(id, addr, profile, callback) {
         if (err) { return callback(err) }
         return callback(obj.status, null)
     });
-}
-
-// MAIN STUFF
-var app = express();
-app.use(bodyParser.json());
-function exitOnError(err) {
-    console.error(err);
-    process.exit(-1);
 }
 
 function newProfileObject(uaPubKey) {
@@ -160,6 +152,11 @@ function RequestUrlFromStore(datastoreUrl, requestObj, callback) {
 ///////////////////////////
 // MAIN SERVER FUNCTIONS //
 ///////////////////////////
+function exitOnError(err) {
+    console.error(err);
+    process.exit(-1);
+}
+
 function connectProfile(request, response) {
     console.log("connectProfile");
     // Check parameters
@@ -261,6 +258,9 @@ function createProfile(request, response) {
     });
 }
 
+var app = express();
+app.use(bodyParser.json());
+
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -280,9 +280,14 @@ app.get('/', function (request, response) {
     response.end(JSON.stringify(success));
 });
 app.post('/', function (request, response) {
-    var method = request.body.method;
-    console.log('POST - method= ' + method);
-    if (method == 'createProfile') {
+    var success = { status: "sucess" };
+    var command = request.body.command;
+    console.log('GET - method = ' + command);
+    
+    if (command == 'connectProfile') {
+        connectProfile(request, response);
+    }
+    if (command == 'createProfile') {
         createProfile(request, response);
     }
     response.end();
